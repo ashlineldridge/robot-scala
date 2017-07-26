@@ -4,7 +4,7 @@ import cats.data.State
 
 import scala.annotation.tailrec
 
-sealed abstract case class Direction(left: Direction, right: Direction) {
+sealed abstract class Direction(left: Direction, right: Direction) {
   @tailrec
   final def rotate(units: Int): Direction =
     units match {
