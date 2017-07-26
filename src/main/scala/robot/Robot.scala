@@ -18,7 +18,7 @@ case object South extends Direction(East, West)
 case object East  extends Direction(North, South)
 case object West  extends Direction(South, North)
 
-case class Robot(position: Option[Position])
+case class Robot(position: Position)
 
 case class Position(x: Int, y: Int, facing: Direction) {
   def next: Position = facing match {
@@ -34,23 +34,23 @@ case class Table(width: Int, height: Int) {
     (0 until width contains p.x) && (0 until height contains p.y)
 }
 
-case class Simulation(robot: Robot, table: Table)
+case class Simulation(robot: Option[Robot], table: Table) {
+  def place(r: Robot): Simulation = copy(robot = Some(r))
+}
 
 object Robot {
   type SimulationState[A] = State[Simulation, A]
 
-  def apply(p: Position): Robot = Robot(Some(p))
-
   def place(p: Position): SimulationState[Unit] =
     State.modify { s =>
-      if (s.table.valid(p)) s.copy(robot = Robot(p))
+      if (s.table.valid(p)) s.place(Robot(p))
       else s
     }
 
   def move: SimulationState[Unit] =
     State.modify {
-      case s @ Simulation(Robot(Some(p)), t) =>
-        if (t.valid(p.next)) s.copy(robot = Robot(p.next))
+      case s @ Simulation(Some(Robot(p)), t) =>
+        if (t.valid(p.next)) s.place(Robot(p.next))
         else s
       case s => s
     }
@@ -61,14 +61,14 @@ object Robot {
 
   def rotate(units: Int): SimulationState[Unit] =
     State.modify {
-      case s @ Simulation(Robot(Some(p)), _) =>
-        s.copy(robot = Robot(p.copy(facing = p.facing.rotate(units))))
+      case s @ Simulation(Some(Robot(p)), _) =>
+        s.place(Robot(p.copy(facing = p.facing.rotate(units))))
       case s => s
     }
 
   def report: SimulationState[String] =
     State.get[Simulation].map {
-      case s @ Simulation(Robot(Some(p)), _) =>
+      case s @ Simulation(Some(Robot(p)), _) =>
         s"${p.x}, ${p.y}, ${p.facing}"
       case _ => "Robot has not been placed"
     }
