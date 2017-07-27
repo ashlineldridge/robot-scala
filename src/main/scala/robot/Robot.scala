@@ -1,22 +1,19 @@
 package robot
 
+import java.lang.Math.floorMod
+
 import cats.data.State
 
-import scala.annotation.tailrec
+object Direction extends Enumeration {
+  type Direction = Value
+  val North, East, South, West = Value
 
-sealed abstract class Direction(left: Direction, right: Direction) {
-  @tailrec
-  final def rotate(units: Int): Direction =
-    units match {
-      case i if i > 0 => right.rotate(units - 1)
-      case i if i < 0 => left.rotate(units + 1)
-      case _          => this
-    }
+  def rotate(d: Direction, units: Int): Direction = {
+    val vs = values.toList
+    vs(floorMod(vs.indexOf(d) + units, vs.length))
+  }
 }
-case object North extends Direction(West, East)
-case object South extends Direction(East, West)
-case object East  extends Direction(North, South)
-case object West  extends Direction(South, North)
+import robot.Direction._
 
 case class Robot(position: Position)
 
@@ -62,7 +59,7 @@ object Robot {
   def rotate(units: Int): SimulationState[Unit] =
     State.modify {
       case s @ Simulation(Some(Robot(p)), _) =>
-        s.place(Robot(p.copy(facing = p.facing.rotate(units))))
+        s.place(Robot(p.copy(facing = Direction.rotate(p.facing, units))))
       case s => s
     }
 
