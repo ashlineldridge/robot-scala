@@ -1,9 +1,12 @@
 plugins {
     id 'scala'
+    id 'application'
     id 'com.github.maiflai.scalatest' version '0.16'
     id 'com.diffplug.gradle.spotless' version '3.4.1'
     id 'org.scoverage' version '2.1.0'
 }
+
+mainClassName = 'robot.Main'
 
 ext {
     scalaVersion = '2.12.2'
@@ -27,10 +30,11 @@ configurations.all {
 dependencies {
     compile "org.scala-lang:scala-library:${scalaVersion}"
     compile "com.typesafe.scala-logging:scala-logging_${scalaBuildVersion}:3.5.0"
-    compile "co.fs2:fs2-core_${scalaBuildVersion}:0.9.7"
-    compile "co.fs2:fs2-io_${scalaBuildVersion}:0.9.7"
+    compile "co.fs2:fs2-core_${scalaBuildVersion}:0.10.0-M4"
+    compile "co.fs2:fs2-io_${scalaBuildVersion}:0.10.0-M4"
     compile "com.github.pureconfig:pureconfig_${scalaBuildVersion}:0.7.2"
     compile "org.typelevel:cats_${scalaBuildVersion}:0.9.0"
+    compile "org.typelevel:cats-effect_${scalaBuildVersion}:0.3"
     compile "io.monix:monix_${scalaBuildVersion}:2.3.0"
     compile "io.monix:monix-cats_${scalaBuildVersion}:2.3.0"
     compile "ch.qos.logback:logback-classic:1.1.7"
